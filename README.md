@@ -1,6 +1,4 @@
 ---
-
-```markdown
 # 📉 Churn Prediction – Predição de Cancelamento de Clientes
 
 Este projeto simula e implementa um sistema de análise e predição de churn (cancelamento) para empresas de serviços, utilizando **Python**, **Machine Learning** (Random Forest), visualização interativa e dashboard em Streamlit.
