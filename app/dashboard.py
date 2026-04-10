@@ -285,8 +285,18 @@ with tab5:
                 with st.chat_message("user"):
                     st.markdown(user_input)
 
-                from groq import Groq
-                client = Groq(api_key=groq_key)
+                try:
+                    from groq import Groq
+
+                    if not groq_key:
+                        raise ValueError("API key não encontrada")
+
+                    client = Groq(api_key=groq_key)
+
+                except Exception as e:
+                    st.error("Erro ao inicializar o assistente de IA.")
+                    st.info("Verifique se a chave da API Groq está configurada corretamente.")
+                    st.stop()
 
                 system_prompt = (
                     "Você é um assistente especialista em retenção de clientes de telecom.\n"
