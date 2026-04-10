@@ -4,6 +4,7 @@ from pathlib import Path
 import joblib
 import pandas as pd
 import streamlit as st
+import altair as alt
 
 # ── paths ──────────────────────────────────────────────────────────────────────
 METRICS   = Path("outputs/metrics.json")
@@ -100,19 +101,38 @@ with tab1:
             st.subheader("Churn por Contrato")
             df_c = load_contrato().copy()
             df_c["churn_%"] = (df_c["churn_rate"] * 100).round(1)
-            st.bar_chart(df_c.set_index("Contract")["churn_%"], y_label="Churn (%)")
+            # ── gráfico contrato ─────────────────────────────
+            chart_c = alt.Chart(df_c).mark_bar().encode(
+                x=alt.X("Contract:N", title="Contrato"),
+                y=alt.Y("churn_%:Q", title="Churn (%)"),
+                tooltip=["Contract", "churn_%"]
+            )
+            st.altair_chart(chart_c, use_container_width=True)
+
 
         with cb:
             st.subheader("Churn por Pagamento")
             df_p = load_pagamento().copy()
             df_p["churn_%"] = (df_p["churn_rate"] * 100).round(1)
-            st.bar_chart(df_p.set_index("PaymentMethod")["churn_%"], y_label="Churn (%)")
+            # ── gráfico pagamento ───────────────────────────
+            chart_p = alt.Chart(df_p).mark_bar().encode(
+                x=alt.X("PaymentMethod:N", title="Pagamento"),
+                y=alt.Y("churn_%:Q", title="Churn (%)"),
+                tooltip=["PaymentMethod", "churn_%"]
+            )
+            st.altair_chart(chart_p, use_container_width=True)
 
         with cc:
             st.subheader("Churn por Faixa de Tempo")
             df_f = load_faixa().copy()
             df_f["churn_%"] = (df_f["churn_rate"] * 100).round(1)
-            st.bar_chart(df_f.set_index("faixa_tempo")["churn_%"], y_label="Churn (%)")
+            # ── gráfico tempo ───────────────────────────────
+            chart_f = alt.Chart(df_f).mark_bar().encode(
+                x=alt.X("faixa_tempo:N", title="Tempo"),
+                y=alt.Y("churn_%:Q", title="Churn (%)"),
+                tooltip=["faixa_tempo", "churn_%"]
+            )
+            st.altair_chart(chart_f, use_container_width=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — Drivers de Churn
@@ -126,7 +146,14 @@ with tab2:
         df_feat = load_features()
         top_n = st.slider("Número de variáveis exibidas", 5, len(df_feat), 15)
         df_top = df_feat.head(top_n).set_index("feature")[["importance"]]
-        st.bar_chart(df_top, y_label="Importância")
+        
+        chart_feat = alt.Chart(df_top.reset_index()).mark_bar().encode(
+            x=alt.X("importance:Q", title="Importância"),
+            y=alt.Y("feature:N", sort="-x", title="Variável"),
+            tooltip=["feature", "importance"]
+        )
+
+        st.altair_chart(chart_feat, use_container_width=True)
 
         with st.expander("Tabela completa de importância"):
             st.dataframe(df_feat, use_container_width=True, hide_index=True)
