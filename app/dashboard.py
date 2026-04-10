@@ -81,7 +81,7 @@ with tab1:
     else:
         m = load_metrics()
         churn_pct = round(m["churn_in_test"] / m["test_size"] * 100, 1)
-
+        st.metric("Taxa de Churn", f"{churn_pct}%")
         c1, c2, c3, c4, c5 = st.columns(5)
         c1.metric("AUC-ROC",   f"{m['auc_roc']:.4f}")
         c2.metric("Precisão",  f"{m['precision']:.4f}")
@@ -230,12 +230,22 @@ with tab3:
             prob = model.predict_proba(row)[0][1]
             st.divider()
 
+            st.markdown("### Recomendação de ação")
+
             if prob >= 0.6:
-                st.error(f"Risco ALTO de churn: {prob:.1%}")
+                st.error("Alto risco de churn")
+                st.write("• Oferecer desconto ou upgrade de plano")
+                st.write("• Priorizar contato ativo")
+                st.write("• Revisar método de pagamento")
+
             elif prob >= 0.35:
-                st.warning(f"Risco MÉDIO de churn: {prob:.1%}")
+                st.warning("Risco moderado")
+                st.write("• Monitorar comportamento")
+                st.write("• Oferecer benefícios leves")
+
             else:
-                st.success(f"Risco BAIXO de churn: {prob:.1%}")
+                st.success("Baixo risco")
+                st.write("• Manter relacionamento")
 
             st.progress(prob, text=f"Probabilidade estimada: {prob:.1%}")
 

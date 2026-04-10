@@ -1,4 +1,4 @@
-# Churn Ops Intelligence
+# Churn Ops Intelligence - Projeto de análise de churn com pipeline completo e dashboard interativo para tomada de decisão em retenção de clientes.
 
 [![Demo ao vivo](https://img.shields.io/badge/Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit)](https://churn-prediction-kw68vghhsd95yci7ppu5cj.streamlit.app/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Luiz%20Nelson-0A66C2?logo=linkedin)](https://www.linkedin.com/in/luiznelson)
@@ -7,6 +7,7 @@
 ---
 
 ## O que este projeto faz
+
 
 Empresas de telecom acumulam milhares de registros de clientes, mas muitas vezes não conseguem transformar esses dados em ações práticas de retenção. Este projeto constrói um pipeline completo de análise de churn sobre o dataset público **Telco Customer Churn** do Kaggle, preparando a base, treinando um modelo preditivo e entregando um dashboard executivo para priorização de clientes com maior risco de cancelamento.
 
