@@ -1,0 +1,15 @@
+__pycache__/
+.venv/
+.env
+.DS_Store
+
+# # data & generated artifacts — do not version
+# data/raw/
+# data/processed/
+# models/
+# outputs/
+
+# secrets — never commit
+.streamlit/secrets.toml
+
+CLAUDE.md

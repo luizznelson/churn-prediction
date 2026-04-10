@@ -1,0 +1,9 @@
+{
+  "auc_roc": 0.8223,
+  "precision": 0.6286,
+  "recall": 0.5294,
+  "f1": 0.5747,
+  "accuracy": 0.7921,
+  "test_size": 1409,
+  "churn_in_test": 374
+}
