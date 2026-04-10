@@ -72,7 +72,8 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 # TAB 1 — Visão Executiva
 # ══════════════════════════════════════════════════════════════════════════════
 with tab1:
-    st.header("Visão Executiva")
+    st.title("Churn Ops Intelligence")
+    st.caption("Monitoramento e previsão de cancelamento de clientes")
 
     required = [METRICS, CONTRATO, PAGAMENTO, FAIXA]
     missing  = [str(p) for p in required if not p.exists()]
@@ -97,14 +98,23 @@ with tab1:
 
         ca, cb, cc = st.columns(3)
 
+        color = alt.condition(
+            alt.datum.churn_ > 40,
+            alt.value("red"),
+            alt.value("steelblue")
+        )
+        
         with ca:
             st.subheader("Churn por Contrato")
-            df_c = load_contrato().copy()
+            with st.spinner("Carregando dados..."):
+                df_c = load_contrato().copy()
             df_c["churn_%"] = (df_c["churn_rate"] * 100).round(1)
+            df_c = df_c.sort_values("churn_%", ascending=False)
             # ── gráfico contrato ─────────────────────────────
             chart_c = alt.Chart(df_c).mark_bar().encode(
                 x=alt.X("Contract:N", title="Contrato"),
                 y=alt.Y("churn_%:Q", title="Churn (%)"),
+                color=color,
                 tooltip=["Contract", "churn_%"]
             )
             st.altair_chart(chart_c, use_container_width=True)
@@ -112,24 +122,30 @@ with tab1:
 
         with cb:
             st.subheader("Churn por Pagamento")
-            df_p = load_pagamento().copy()
+            with st.spinner("Carregando dados..."):
+                df_p = load_pagamento().copy()
             df_p["churn_%"] = (df_p["churn_rate"] * 100).round(1)
+            df_p = df_p.sort_values("churn_%", ascending=False)
             # ── gráfico pagamento ───────────────────────────
             chart_p = alt.Chart(df_p).mark_bar().encode(
                 x=alt.X("PaymentMethod:N", title="Pagamento"),
                 y=alt.Y("churn_%:Q", title="Churn (%)"),
+                color=color,
                 tooltip=["PaymentMethod", "churn_%"]
             )
             st.altair_chart(chart_p, use_container_width=True)
 
         with cc:
             st.subheader("Churn por Faixa de Tempo")
-            df_f = load_faixa().copy()
+            with st.spinner("Carregando dados..."):
+                df_f = load_faixa().copy()
             df_f["churn_%"] = (df_f["churn_rate"] * 100).round(1)
+            df_f = df_f.sort_values("churn_%", ascending=False)
             # ── gráfico tempo ───────────────────────────────
             chart_f = alt.Chart(df_f).mark_bar().encode(
                 x=alt.X("faixa_tempo:N", title="Tempo"),
                 y=alt.Y("churn_%:Q", title="Churn (%)"),
+                color=color,
                 tooltip=["faixa_tempo", "churn_%"]
             )
             st.altair_chart(chart_f, use_container_width=True)
@@ -229,6 +245,20 @@ with tab3:
 
             prob = model.predict_proba(row)[0][1]
             st.divider()
+            
+            st.markdown("### Principais fatores deste perfil")
+
+            if contract == "Month-to-month":
+                st.write("• Contrato mensal aumenta o risco de churn")
+
+            if payment_method == "Electronic check":
+                st.write("• Método de pagamento associado a maior churn")
+
+            if tenure < 12:
+                st.write("• Baixo tempo de relacionamento aumenta o risco")
+
+            if monthly_charges > 80:
+                st.write("• Cobrança mensal elevada pode aumentar o risco")
 
             st.markdown("### Recomendação de ação")
 
@@ -295,19 +325,19 @@ with tab5:
                 with st.chat_message("user"):
                     st.markdown(user_input)
 
+                # ── criação segura do client ─────────────────────
+                client = None
+
                 try:
                     from groq import Groq
 
-                    if not groq_key:
-                        raise ValueError("API key não encontrada")
+                    if groq_key:
+                        client = Groq(api_key=groq_key)
 
-                    client = Groq(api_key=groq_key)
+                except Exception:
+                    client = None
 
-                except Exception as e:
-                    st.error("Erro ao inicializar o assistente de IA.")
-                    st.info("Verifique se a chave da API Groq está configurada corretamente.")
-                    st.stop()
-
+                # ── prompt ──────────────────────────────────────
                 system_prompt = (
                     "Você é um assistente especialista em retenção de clientes de telecom.\n"
                     "Responda APENAS com base no contexto abaixo. "
@@ -322,14 +352,22 @@ with tab5:
                     for m in st.session_state.messages
                 ]
 
-                with st.chat_message("assistant"):
-                    with st.spinner("Analisando..."):
-                        response = client.chat.completions.create(
-                            model="llama-3.1-8b-instant",
-                            temperature=0.1,
-                            messages=api_messages,
-                        )
-                        answer = response.choices[0].message.content
-                    st.markdown(answer)
+                # ── resposta segura ─────────────────────────────
+                if client is None:
+                    with st.chat_message("assistant"):
+                        st.warning("Assistente indisponível no momento.")
+                else:
+                    with st.chat_message("assistant"):
+                        with st.spinner("Analisando..."):
+                            response = client.chat.completions.create(
+                                model="llama-3.1-8b-instant",
+                                temperature=0.1,
+                                messages=api_messages,
+                            )
+                            answer = response.choices[0].message.content
 
-                st.session_state.messages.append({"role": "assistant", "content": answer})
+                        st.markdown(answer)
+
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": answer}
+                    )
