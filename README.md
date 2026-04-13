@@ -1,6 +1,6 @@
 # Churn Ops Intelligence - Projeto de análise de churn com pipeline completo e dashboard interativo para tomada de decisão em retenção de clientes.
 
-[![Demo ao vivo](https://img.shields.io/badge/Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit)](https://churn-prediction-kw68vghhsd95yci7ppu5cj.streamlit.app/)
+[![Demo ao vivo](https://img.shields.io/badge/Demo-Streamlit%20Cloud-FF4B4B?logo=streamlit)](https://churn-prediction-intelligence.streamlit.app/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Luiz%20Nelson-0A66C2?logo=linkedin)](https://www.linkedin.com/in/luiznelson)
 [![GitHub](https://img.shields.io/badge/GitHub-luizznelson-181717?logo=github)](https://github.com/luizznelson)
 
